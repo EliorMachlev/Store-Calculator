@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>מחשבון יעד יומי</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Align items from the top to accommodate tabs */
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px;
+            font-family: 'Arial', sans-serif;
+            flex-direction: column;
+            /* Arrange body elements vertically */
+        }
+
+        .dark-mode {
+            background-color: #333;
+            color: white;
+        }
+
+        .tab-container {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .tab-container {
+            background-color: #444;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: #eee;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+
+        .dark-mode .tabs {
+            background-color: #555;
+        }
+
+        .tab-button {
+            flex-grow: 1;
+            padding: 10px 0;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            color: #333;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-mode .tab-button {
+            color: white;
+        }
+
+        .tab-button.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .dark-mode .tab-button.active {
+            background-color: #66b2ff;
+            color: #333;
+        }
+
+        .tab-content {
+            padding: 20px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .dark-mode .tab-content {
+            background-color: #444;
+        }
+
+        .tab-content>div {
+            display: none;
+        }
+
+        .tab-content>div.active {
+            display: block;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            color: #007bff;
+            text-align: center;
+        }
+
+        .dark-mode h2 {
+            color: #66b2ff;
+        }
+
+        label {
+            margin: 10px 0 5px;
+            font-weight: bold;
+            display: block;
+            /* Make labels take full width */
+            text-align: right;
+            /* Align labels to the right */
+        }
+
+        .dark-mode label {
+            color: white;
+        }
+
+        input[type="number"],
+        input[readonly] {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            color: #333;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s, background-color 0.3s;
+            font-weight: bold;
+            margin-bottom: 10px;
+            /* Add some space below input fields */
+        }
+
+        .dark-mode input[type="number"],
+        .dark-mode input[readonly] {
+            background-color: #555;
+            border-color: #666;
+            color: white;
+        }
+
+        input[type="number"]:focus,
+        input[readonly]:focus {
+            border-color: #007bff !important;
+            background-color: #fff;
+            outline: none !important;
+        }
+
+        .dark-mode input[type="number"]:focus,
+        .dark-mode input[readonly]:focus {
+            border-color: #66b2ff !important;
+            background-color: #666;
+        }
+
+        .invalid-input {
+            color: red !important;
+            font-weight: bold !important;
+            outline: 2px solid red !important;
+        }
+
+        button#theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px;
+            z-index: 10;
+            border-radius: 5px;
+        }
+
+        button#custom-reset-button {
+            /* Added an ID to the reset button */
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            width: auto;
+            transition: background-color 0.3s, width 0.3s;
+            display: block;
+            /* Make reset button take full width */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .inline-fields {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .inline-fields div {
+            margin: 10px 0;
+        }
+
+        @media (min-width: 600px) {
+            .tab-container {
+                max-width: 600px;
+            }
+
+            .inline-fields {
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 20px;
+                margin-bottom: 10px;
+                align-items: center;
+            }
+
+            .inline-fields div {
+                margin: 0;
+                width: calc(50% - 10px);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .tab-container {
+                max-width: 800px;
+            }
+
+            .inline-fields {
+                gap: 30px;
+            }
+
+            .inline-fields div {
+                width: calc(50% - 15px);
+            }
+        }
+
+        .sum-field {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-top: 20px;
+            display: block;
+            text-align: center;
+        }
+
+        #sum,
+        #daily-goal {
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background-color: #f0f8ff;
+            color: #007bff;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background-color 0.5s ease;
+            display: block;
+            /* Ensure it takes full width */
+        }
+
+        .dark-mode #sum,
+        .dark-mode #daily-goal {
+            border-color: #66b2ff;
+            background-color: #4a5568;
+            color: #66b2ff;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.8em;
+            margin-top: 5px;
+            text-align: right;
+            display: block;
+        }
+
+        #current-date-info-bags,
+        #current-date-info-sales {
+            display: flex;
+            align-items: center;
+            /* Vertically align items in the center */
+            justify-content: flex-end;
+            /* Push items to the right */
+            margin-bottom: 5px;
+            /* Add a little space below */
+        }
+
+        #current-date-bags,
+        #current-date-sales {
+            margin-left: 5px;
+            /* Add some space between the date and the label */
+            margin-right: 15px;
+            margin-top: 7px;
+        }
+
+        #date-label-bags,
+        #date-label-sales {
+            margin-right: 5px;
+            /* Add some space before the label if needed */
+        }
+    </style>
+</head>
+
+<body>
+    <button id="theme-toggle" onclick="toggleTheme()" class="btn btn-secondary">
+        <span id="theme-icon" class="fas fa-sun"></span>
+    </button>
+    <div class="tab-container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'bags')">תיקים</button>
+            <button class="tab-button" onclick="openTab(event, 'sales')">מכירות</button>
+        </div>
+        <div class="tab-content">
+            <div id="bags" class="tab-pane active">
+                <h2 aria-level="1">יעד יומי - תיקים</h2>
+                <div aria-live="polite" id="current-date-info-bags">
+                    <span id="current-date-bags" aria-labelledby="date-label-bags"></span>
+                    <label id="date-label-bags" for="current-date-bags">: תאריך </label>
+                </div>
+                <br>
+                <div>
+                    <label for="WorkDays">: ימי עבודה</label>
+                    <input type="number" id="WorkDays" name="WorkDays"
+                        oninput="validateWorkDays(this); calculateBagsSumIfValid();" required
+                        aria-describedby="workdays-error" title="הזן את מספר ימי העבודה החודשיים שלך.">
+                    <div class="error-message" id="workdays-error" role="alert"></div>
+                </div>
+                <div>
+                    <label for="MonthlyGoal">: (₪) יעד מכר חודשי</label>
+                    <input type="number" id="MonthlyGoal" name="MonthlyGoal"
+                        oninput="validateMonthlyGoal(this); calculateBagsSumIfValid();" required
+                        aria-describedby="monthlygoal-error" title="הזן את יעד המכירות החודשי שלך בשקלים.">
+                    <div class="error-message" id="monthlygoal-error" role="alert"></div>
+                </div>
+                <div class="inline-fields">
+                    <div>
+                        <label for="BagsMonthlyGoal">: (%) יעד חודשי תיקים</label>
+                        <input type="number" id="BagsMonthlyGoal" name="BagsMonthlyGoal"
+                            oninput="validateBagsMonthlyGoal(this); calculateBagsSumIfValid();"
+                            aria-describedby="bagsmonthlygoal-error"
+                            title="הזן את אחוז יעד המכירות החודשי המוקדש לתיקים.">
+                        <div class="error-message" id="bagsmonthlygoal-error" role="alert"></div>
+                    </div>
+                    <div>
+                        <label for="BagsSold">: (₪) סכום כספי - תיקים שנמכרו</label>
+                        <input type="number" id="BagsSold" name="BagsSold"
+                            oninput="validateBagsSold(this); calculateBagsSumIfValid();" required
+                            aria-describedby="bagssold-error"
+                            title="הזן את הסכום הכולל של תיקים שנמכרו עד כה החודש בשקלים.">
+                        <div class="error-message" id="bagssold-error" role="alert"></div>
+                    </div>
+                </div>
+                <label for="sum" class="sum-field"><b>: יעד תיקים יומי</b></label>
+                <input type="number" id="sum" name="sum" readonly style="font-weight: bold;" aria-readonly="true">
+                <button id="reset-bags" class="btn btn-secondary"
+                    style="margin-top: 10px; display: block; margin-left: auto; margin-right: auto;">אתחול</button>
+            </div>
+            <div id="sales" class="tab-pane">
+                <h2 aria-level="1">יעד יומי - מכירות</h2>
+                <div aria-live="polite" id="current-date-info-sales">
+                    <span id="current-date-sales" aria-labelledby="date-label-sales"></span>
+                    <label id="date-label-sales" for="current-date-sales">: תאריך </label>
+                </div>
+                <br>
+                <div>
+                    <label for="MonthDays">: ימי עבודה</label>
+                    <input type="number" id="MonthDays" name="MonthDays"
+                        oninput="validateMonthDays(this); calculateSalesGoalIfValid();" required
+                        aria-describedby="monthdays-error" title="הזן את מספר ימי החודש.">
+                    <div class="error-message" id="monthdays-error" role="alert"></div>
+                </div>
+                <div>
+                    <label for="SalesGoal">: (₪) יעד מכר חודשי</label>
+                    <input type="number" id="SalesGoal" name="SalesGoal"
+                        oninput="validateSalesGoal(this); calculateSalesGoalIfValid();" required
+                        aria-describedby="salesgoal-error" title="הזן את יעד המכירות החודשי בשקלים.">
+                    <div class="error-message" id="salesgoal-error" role="alert"></div>
+                </div>
+                <div>
+                    <label for="CurrentSales">: (₪) מכירות נוכחיות</label>
+                    <input type="number" id="CurrentSales" name="CurrentSales"
+                        oninput="validateCurrentSales(this); calculateSalesGoalIfValid();" required
+                        aria-describedby="currentsales-error" title="הזן את סך המכירות הנוכחיות בשקלים.">
+                    <div class="error-message" id="currentsales-error" role="alert"></div>
+                </div>
+                <label for="daily-goal" class="sum-field"><b>: (₪) יעד מכירות יומי</b></label>
+                <input type="number" id="daily-goal" name="daily-goal" readonly style="font-weight: bold;"
+                    aria-readonly="true">
+                <button id="reset-sales" class="btn btn-secondary"
+                    style="margin-top: 10px; display: block; margin-left: auto; margin-right: auto;">אתחול</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+            tabcontent = document.getElementsByClassName("tab-pane");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+
+            // Update current date for the active tab
+            const currentDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            if (tabName === 'bags') {
+                document.getElementById('current-date-bags').textContent = currentDate;
+            } else if (tabName === 'sales') {
+                document.getElementById('current-date-sales').textContent = currentDate;
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+
+            var themeIcon = document.getElementById('theme-icon');
+
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+
+        // --- Bags Tab Functions ---
+        function calculateBagsSumIfValid() {
+            if (document.getElementById('workdays-error').textContent === "" &&
+                document.getElementById('monthlygoal-error').textContent === "" &&
+                document.getElementById('bagsmonthlygoal-error').textContent === "" &&
+                document.getElementById('bagssold-error').textContent === "") {
+                calculateBagsSum();
+            } else {
+                document.getElementById('sum').value = ''; // Clear the sum if not valid
+            }
+        }
+
+        function calculateBagsSum() {
+            var WorkDays = parseInt(document.getElementById('WorkDays').value) || 0;
+            var MonthlyGoal = parseInt(document.getElementById('MonthlyGoal').value) || 0;
+            var BagsMonthlyGoal = parseInt(document.getElementById('BagsMonthlyGoal').value) || 0;
+            var BagsSold = parseInt(document.getElementById('BagsSold').value) || 0;
+
+            var sumResult = Math.round((((MonthlyGoal * BagsMonthlyGoal / 100) - BagsSold) / 105 / WorkDays));
+
+            var sumInput = document.getElementById('sum');
+            sumInput.value = isNaN(sumResult) || !isFinite(sumResult) ? '' : sumResult;
+
+            sumInput.classList.add('updated');
+            setTimeout(() => {
+                sumInput.classList.remove('updated');
+            }, 500);
+        }
+
+        function validateWorkDays(inputElement) {
+            var WorkDays = inputElement.value;
+            var errorDiv = document.getElementById('workdays-error');
+            errorDiv.textContent = "";
+            inputElement.classList.remove('invalid-input');
+
+            if (WorkDays !== "" && (WorkDays < 1 || WorkDays > 31)) {
+                errorDiv.textContent = "ערך 'ימי עבודה' חייב להיות מספר בין 1 ל31";
+                inputElement.classList.add('invalid-input');
+            }
+        }
+
+        function validateMonthlyGoal(inputElement) {
+            var MonthlyGoal = inputElement.value;
+            var errorDiv = document.getElementById('monthlygoal-error');
+            errorDiv.textContent = "";
+            inputElement.classList.remove('invalid-input');
+
+            if (MonthlyGoal !== "" && (MonthlyGoal < 0)) {
+                errorDiv.textContent = "ערך 'יעד מכר חודשי' חייב להיות מספר גדול או שווה ל0";
+                inputElement.classList.add('invalid-input');
+            }
+        }
+
+        function validateBagsMonthlyGoal(inputElement) {
+            var BagsMonthlyGoal = inputElement.value;
+            var errorDiv = document.getElementById('bagsmonthlygoal-error');
+            errorDiv.textContent = "";
+            inputElement.classList.remove('invalid-input');
+
+            if (BagsMonthlyGoal !== "" && (BagsMonthlyGoal < 0 || BagsMonthlyGoal > 100)) {
+                errorDiv.textContent = "ערך 'יעד חודשי תיקים' חייב להיות מספר בין 0 ל100";
+                inputElement.classList.add('invalid-input');
+            }
+        }
+
+        function validateBagsSold(inputElement) {
+            var BagsSold = inputElement.value;
+            var errorDiv = document.getElementById('bagssold-error');
+            errorDiv.textContent = "";
+            inputElement.classList.remove('invalid-input');
+
+            if (BagsSold !== "" && (BagsSold < 0)) {
+                errorDiv.textContent = "ערך 'סכום כספי - תיקים שנמכרו' חייב להיות מספר גדול או שווה ל0";
+                inputElement.classList.add('invalid-input');
+            }
+        }
+
+        document.getElementById('reset-bags').addEventListener('click', function () {
+            document.getElementById('WorkDays').value = '';
+            document.getElementById('MonthlyGoal').value = '';
+            document.getElementById('BagsMonthlyGoal').value = '';
+            document.getElementById('BagsSold').value = '';
+            document.getElementById('sum').value = '';
+            document.querySelectorAll('#bags .error-message').forEach(div => div.textContent = '');
+            document.querySelectorAll('#bags input[type="number"]').forEach(input => input.classList.remove('invalid-input'));
+        });
+
+        // --- Sales Tab Functions ---
+        function calculateSalesGoalIfValid() {
+            if (document.getElementById('MonthDays').value !== "" &&
+                document.getElementById('SalesGoal').value !== "" ) {
+                calculateDailyGoal();
+            } else {
+                document.getElementById('daily-goal').value = '';
+            }
+        }
+
+        function calculateDailyGoal() {
+            var MonthDays = parseInt(document.getElementById('MonthDays').value) || 0;
+            var SalesGoal = parseInt(document.getElementById('SalesGoal').value) || 0;
+            var currentSalesInput = document.getElementById('CurrentSales').value;
+            var CurrentSales = 0;
+
+            if (currentSalesInput.trim() === "") {
+                CurrentSales = 0; // Treat empty or whitespace as 0
+            } else {
+                CurrentSales = parseInt(currentSalesInput) || 0; // Parse as integer, default to 0 if NaN
+            }
+
+            var dailyGoalResult = Math.round((SalesGoal - CurrentSales) / MonthDays);
+
+            var dailyGoalInput = document.getElementById('daily-goal');
+            dailyGoalInput.value = isNaN(dailyGoalResult) || !isFinite(dailyGoalResult) ? '' : dailyGoalResult;
+
+            dailyGoalInput.classList.add('updated');
+            setTimeout(() => {
+                dailyGoalInput.classList.remove('updated');
+            }, 500);
+        }
+
+        function validateMonthDays(inputElement) {
+            var MonthDays = inputElement.value;
+            var errorDiv = document.getElementById('monthdays-error');
+            errorDiv.textContent = "";
+            inputElement.classList.remove('invalid-input');
+
+            if (MonthDays !== "" && (MonthDays < 1 || MonthDays > 31)) {
+                errorDiv.textContent = "ערך 'ימי עבודה' חייב להיות מספר בין 1 ל31";
+                inputElement.classList.add('invalid-input');
+            }
+        }
+
+        function validateSalesGoal(inputElement) {
+            var SalesGoal = inputElement.value;
+            var errorDiv = document.getElementById('salesgoal-error');
+            errorDiv.textContent = "";
+            inputElement.classList.remove('invalid-input');
+
+            if (SalesGoal !== "" && (SalesGoal < 0)) {
+                errorDiv.textContent = "ערך 'יעד מכר חודשי' חייב להיות מספר גדול או שווה ל0";
+                inputElement.classList.add('invalid-input');
+            }
+        }
+
+        function validateCurrentSales(inputElement) {
+            var CurrentSales = inputElement.value;
+            var errorDiv = document.getElementById('currentsales-error');
+            errorDiv.textContent = "";
+            inputElement.classList.remove('invalid-input');
+
+            if (CurrentSales !== "" && (CurrentSales < 0)) {
+                errorDiv.textContent = "ערך 'מכירות נוכחיות' חייב להיות מספר גדול או שווה ל0";
+                inputElement.classList.add('invalid-input');
+            }
+        }
+
+        document.getElementById('reset-sales').addEventListener('click', function () {
+            document.getElementById('MonthDays').value = '';
+            document.getElementById('SalesGoal').value = '';
+            document.getElementById('CurrentSales').value = '';
+            document.getElementById('daily-goal').value = '';
+            document.querySelectorAll('#sales .error-message').forEach(div => div.textContent = '');
+            document.querySelectorAll('#sales input[type="number"]').forEach(input => input.classList.remove('invalid-input'));
+        });
+
+        // Initialize the date for the default active tab (Bags)
+
+        var Date = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        document.getElementById('current-date-bags').textContent = Date;
+        document.getElementById('current-date-sales').textContent = Date;
+    </script>
+</body>
+
+</html>
